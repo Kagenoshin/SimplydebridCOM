@@ -28,9 +28,10 @@ class SimplydebridCOM(Hoster):
 		
 		self.logDebug("simply-debrid.com: Old URL: %s" % pyfile.url)
 		
-		#fix old (?) cloudzer links
+		#fix the links for simply-debrid.com!
 		new_url = pyfile.url
 		new_url = new_url.replace("clz.to", "cloudzer.net/file")
+		new_url = new_url.replace("http://share-online", "http://www.share-online")
 		
 		if re.match(self.__pattern__, new_url):
 			new_url = new_url
@@ -38,7 +39,7 @@ class SimplydebridCOM(Hoster):
 			page = self.req.load('http://simply-debrid.com/api.php?dl='+new_url)#+'&u='+self.user+'&p='+self.account.getAccountData(self.user)['password'])
 			if(re.search(r'tiger\sLink',page,re.I) or re.search(r'Invalid\sLink',page,re.I) or (re.search(r'api',page,re.I) and re.search(r'error',page,re.I))):
 				self.fail('Unable to unrestrict link')
-			print page
+			#print page
 			new_url = page
 		
 		#print new_url
