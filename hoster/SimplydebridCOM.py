@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from module.plugins.Hoster import Hoster
-from module.utils import html_unescape
 from urllib import quote, unquote
-from time import sleep
 import re
 
-class SimplydebridCOM(Hoster):
-    __name__ = "SimplydebridCOM"
+from module.plugins.Hoster import Hoster
+
+
+class SimplydebridCom(Hoster):
+    __name__ = "SimplydebridCom"
     __version__ = "0.1"
     __type__ = "hoster"
     __pattern__ = r"http://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/sd.php/*"
@@ -24,9 +24,9 @@ class SimplydebridCOM(Hoster):
         if not self.account:
             self.logError(_("Please enter your simply-debrid.com account or deactivate this plugin"))
             self.fail("No simply-debrid.com account provided")
-        
-        self.logDebug("simply-debrid.com: Old URL: %s" % pyfile.url)
-        
+
+        self.logDebug("Old URL: %s" % pyfile.url)
+
         #fix the links for simply-debrid.com!
         new_url = pyfile.url
         new_url = new_url.replace("clz.to", "cloudzer.net/file")
@@ -40,14 +40,15 @@ class SimplydebridCOM(Hoster):
         
         if re.match(self.__pattern__, new_url):
             new_url = new_url
-        else:
-            page = self.req.load('http://simply-debrid.com/api.php?dl='+new_url)#+'&u='+self.user+'&p='+self.account.getAccountData(self.user)['password'])
-            if('tiger Link' in page or 'Invalid Link' in page or ('API' in page and 'ERROR' in page)):
+
+        if not re.match(self.__pattern__, new_url):
+            page = self.load('http://simply-debrid.com/api.php', get={'dl': new_url}) #+'&u='+self.user+'&p='+self.account.getAccountData(self.user)['password'])
+            if 'tiger Link' in page or 'Invalid Link' in page or ('API' in page and 'ERROR' in page):
                 self.fail('Unable to unrestrict link')
             new_url = page
-        
+
         self.setWait(5)
         self.wait()
         self.logDebug("Unrestricted URL: " + new_url)
-        
+
         self.download(new_url, disposition=True)
